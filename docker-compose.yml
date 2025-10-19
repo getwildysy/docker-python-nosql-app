@@ -5,15 +5,26 @@ services:
     build: .
     # 將容器的 5000 埠號映射到主機的 8000 埠號
     # 這樣你可以透過 http://localhost:8000 訪問
-    ports:
-      - "8000:5000"
+    # ports:
+    #   - "8000:5000"
+
     # 確保 web 服務在 mongodb 服務啟動後才啟動
     depends_on:
       - mongodb
-    # 這是為了讓 Flask 伺服器在容器內正確運行 (0.0.0.0)
-    command: ["python", "app.py"]
-    # 立即重新啟動服務，以防啟動失敗（例如 MongoDB 尚未準備好）
+    command: ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
     restart: always
+
+  # 2. Nginx 反向代理服務 (處理公網埠號 80/443)
+  nginx:
+    image: nginx:stable-alpine
+    # 將主機的 80 埠號映射到 Nginx 容器的 80 埠號
+    ports:
+      - "80:80"
+    volumes:
+      # 將我們剛建立的設定檔掛載到 Nginx 容器的正確位置
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - web # 確保 web 服務啟動後才啟動 Nginx
 
   # 資料庫服務 (NoSQL DB Service)
   mongodb:
