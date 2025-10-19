@@ -1,0 +1,31 @@
+services:
+  # 應用程式服務 (Web Service)
+  web:
+    # 告訴 Docker Compose 在當前目錄下使用 Dockerfile 建立映像檔
+    build: .
+    # 將容器的 5000 埠號映射到主機的 8000 埠號
+    # 這樣你可以透過 http://localhost:8000 訪問
+    ports:
+      - "8000:5000"
+    # 確保 web 服務在 mongodb 服務啟動後才啟動
+    depends_on:
+      - mongodb
+    # 這是為了讓 Flask 伺服器在容器內正確運行 (0.0.0.0)
+    command: ["python", "app.py"]
+    # 立即重新啟動服務，以防啟動失敗（例如 MongoDB 尚未準備好）
+    restart: always
+
+  # 資料庫服務 (NoSQL DB Service)
+  mongodb:
+    # 使用官方的 MongoDB 映像檔
+    image: mongo:latest
+    # 將 MongoDB 的資料儲存到主機的持久化空間中
+    volumes:
+      - mongo_data:/data/db
+    # 映射埠號 (可選，但有助於除錯)
+    ports:
+      - "27017:27017"
+
+# 定義一個 Volume，用於持久化儲存 MongoDB 的資料
+volumes:
+  mongo_data:
