@@ -1,0 +1,15 @@
+# 專門為 Python 設計的忽略清單
+__pycache__/
+*.pyc
+
+# 專門為 Docker 設計的忽略清單
+# 忽略由 docker-compose.yml 定義的本地資料庫 Volume
+# 我們在步驟四中定義了 mongo_data:，這是資料庫的實際儲存位置
+mongo_data/
+
+# 忽略 Docker 產生的日誌和其他暫存檔
+.docker/
+*.log
+
+# 忽略本地環境設定檔 (如果之後有使用到)
+.env
